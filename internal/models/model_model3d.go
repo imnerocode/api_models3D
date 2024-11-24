@@ -9,4 +9,5 @@ type Model3D struct {
 	Size      int64      `bson:"size"`
 	CreatedAt time.Time  `bson:"createdAt"`
 	DeletedAt *time.Time `bson:"deletedAt,omitempty"`
+	Tags      []string   `bson:"tags"`
 }
