@@ -9,7 +9,7 @@ RUN go mod download
 COPY . ./
 RUN go build -o main ./cmd/api
 
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 
 WORKDIR /app
 
