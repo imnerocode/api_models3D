@@ -8,4 +8,4 @@ services:
     environment:
       - MONGO_URI=${MONGO_URI}
     env_file:
-      - .env
+      - D:/Programing/Golang/apis/api_models3D/.env
