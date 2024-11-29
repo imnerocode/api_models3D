@@ -4,6 +4,7 @@ import "time"
 
 type Model3D struct {
 	ID        string     `bson:"_id,omitempty" json:"_id"`
+	File      byte       `bson:"file" json:"file"`
 	Name      string     `bson:"name" json:"name"`
 	Format    string     `bson:"format" json:"format"`
 	Size      int64      `bson:"size" json:"size"`
