@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"bytes"
 	"context"
 	"time"
 
@@ -9,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/gridfs"
 )
 
 type Model3DRepository struct {
@@ -17,6 +19,25 @@ type Model3DRepository struct {
 
 func NewModel3DRepository(client *mongo.Client) *Model3DRepository {
 	return &Model3DRepository{Client: client}
+}
+
+func (r *Model3DRepository) UploadFile(filename string, data []byte, bucket *gridfs.Bucket) (fileId interface{}, err error) {
+	idFile, err := bucket.UploadFromStream(filename, bytes.NewReader(data))
+	if err != nil {
+		return nil, err
+	}
+
+	return idFile, nil
+}
+
+func (r *Model3DRepository) DownloadFile(filename string, dest *bytes.Buffer, bucket *gridfs.Bucket) ([]byte, error) {
+	_, err := bucket.DownloadToStreamByName(filename, dest)
+	if err != nil {
+		return nil, err
+	}
+
+	return dest.Bytes(), nil
+
 }
 
 func (r *Model3DRepository) PostModel3D(model3d *models.Model3D) (string, error) {
