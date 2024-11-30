@@ -9,6 +9,7 @@ import (
 	"github.com/imnerocode/apis/api_models3D/internal/config"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/gridfs"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
@@ -48,6 +49,14 @@ func (conn *ConnectionDBImpl) GetConnectionDB() (*mongo.Client, error) {
 	conn.Client = client
 	return client, nil
 
+}
+
+func (conn *ConnectionDBImpl) GetBucketFs(db *mongo.Database) (*gridfs.Bucket, error) {
+	bucket, err := gridfs.NewBucket(db)
+	if err != nil {
+		return nil, err
+	}
+	return bucket, nil
 }
 
 func (conn *ConnectionDBImpl) LoadEnv(pathToEnv, keyEnv string) string {
