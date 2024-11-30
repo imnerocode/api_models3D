@@ -19,13 +19,20 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	dbCtx := db.GetDatabase()
+	bucket, err := db.GetBucketFs(dbCtx)
+	if err != nil {
+		panic(err)
+	}
 
 	model3dRepository := repositories.NewModel3DRepository(client)
-	model3dService := services.NewModel3DService(model3dRepository)
+	model3dService := services.NewModel3DService(model3dRepository, bucket)
 	model3dHandler := handlers.NewHandlerModel3D(model3dService)
 
 	r.POST("api/model3d/post", model3dHandler.PostModel3D)
+	r.POST("api/model3d/upload", model3dHandler.UploadFile)
 	r.GET("api/model3d/get", model3dHandler.GetModel3D)
+	r.GET("api/model3d/download", model3dHandler.DownloadFile)
 	r.DELETE("api/model3d/delete", model3dHandler.DeleteModel3D)
 
 	r.Run(":8080")
