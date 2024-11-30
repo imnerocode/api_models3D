@@ -51,6 +51,11 @@ func (conn *ConnectionDBImpl) GetConnectionDB() (*mongo.Client, error) {
 
 }
 
+func (conn *ConnectionDBImpl) GetDatabase() *mongo.Database {
+	db := conn.Client.Database(config.DatabaseName)
+	return db
+}
+
 func (conn *ConnectionDBImpl) GetBucketFs(db *mongo.Database) (*gridfs.Bucket, error) {
 	bucket, err := gridfs.NewBucket(db)
 	if err != nil {
