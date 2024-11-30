@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -64,4 +65,55 @@ func (h *HandlerModel3D) DeleteModel3D(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Model deleted successfully"})
+}
+
+func (h *HandlerModel3D) UploadFile(c *gin.Context) {
+	file, err := c.FormFile("file")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid format data"})
+		return
+	}
+	f, err := file.Open()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cannot open file"})
+		return
+	}
+
+	defer f.Close()
+
+	data := make([]byte, file.Size)
+	_, err = f.Read(data)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cannot read file"})
+		return
+	}
+
+	fileId, err := h.model3dService.UploadFile(file.Filename, data)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cannot upload file"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"message": "File uploaded successfully", "file_id": fileId})
+}
+
+func (h *HandlerModel3D) DownloadFile(c *gin.Context) {
+	// Obtener el nombre del archivo desde los parámetros
+	filename := c.Query("filename")
+	if filename == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Filename is required"})
+		return
+	}
+
+	// Llamar al servicio para descargar el archivo
+	data, err := h.model3dService.DownloadFile(filename)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cannot download file"})
+		return
+	}
+
+	// Establecer los encabezados para la respuesta
+	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
+	c.Header("Content-Type", "application/octet-stream")
+	c.Data(http.StatusOK, "application/octet-stream", data)
 }
