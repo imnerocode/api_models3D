@@ -10,10 +10,11 @@ import (
 
 type ServiceModel3D struct {
 	model3dRepository *repositories.Model3DRepository
+	bucket            *gridfs.Bucket
 }
 
-func NewModel3DService(model3dRepository *repositories.Model3DRepository) *ServiceModel3D {
-	return &ServiceModel3D{model3dRepository: model3dRepository}
+func NewModel3DService(model3dRepository *repositories.Model3DRepository, bucket *gridfs.Bucket) *ServiceModel3D {
+	return &ServiceModel3D{model3dRepository: model3dRepository, bucket: bucket}
 }
 
 func (s *ServiceModel3D) PostModel3D(model3d *models.Model3D) (string, error) {
@@ -42,15 +43,15 @@ func (s *ServiceModel3D) DeleteModel3D(idModel string) (bool, error) {
 	return true, nil
 }
 
-func (s *ServiceModel3D) UploadFile(filename string, data []byte, bucket *gridfs.Bucket) (fileId interface{}, err error) {
-	idFile, err := s.model3dRepository.UploadFile(filename, data, bucket)
+func (s *ServiceModel3D) UploadFile(filename string, data []byte) (fileId interface{}, err error) {
+	idFile, err := s.model3dRepository.UploadFile(filename, data, s.bucket)
 	if err != nil {
 		return nil, err
 	}
 	return idFile, nil
 }
-func (s *ServiceModel3D) DownloadFile(filename string, dest *bytes.Buffer, bucket *gridfs.Bucket) ([]byte, error) {
-	dataFile, err := s.model3dRepository.DownloadFile(filename, dest, bucket)
+func (s *ServiceModel3D) DownloadFile(filename string, dest *bytes.Buffer) ([]byte, error) {
+	dataFile, err := s.model3dRepository.DownloadFile(filename, dest, s.bucket)
 	if err != nil {
 		return nil, err
 	}
