@@ -98,21 +98,21 @@ func (h *HandlerModel3D) UploadFile(c *gin.Context) {
 }
 
 func (h *HandlerModel3D) DownloadFile(c *gin.Context) {
-	// Obtener el nombre del archivo desde los parámetros
+	// Get file name from parameters
 	filename := c.Query("filename")
 	if filename == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Filename is required"})
 		return
 	}
 
-	// Llamar al servicio para descargar el archivo
+	// Call the service to download the file
 	data, err := h.model3dService.DownloadFile(filename)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Cannot download file"})
 		return
 	}
 
-	// Establecer los encabezados para la respuesta
+	// Set headers for the response
 	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
 	c.Header("Content-Type", "application/octet-stream")
 	c.Data(http.StatusOK, "application/octet-stream", data)
