@@ -2,6 +2,7 @@ package services
 
 import (
 	"bytes"
+	"fmt"
 
 	"github.com/imnerocode/apis/api_models3D/internal/models"
 	"github.com/imnerocode/apis/api_models3D/internal/repositories"
@@ -50,10 +51,16 @@ func (s *ServiceModel3D) UploadFile(filename string, data []byte) (fileId interf
 	}
 	return idFile, nil
 }
-func (s *ServiceModel3D) DownloadFile(filename string, dest *bytes.Buffer) ([]byte, error) {
-	dataFile, err := s.model3dRepository.DownloadFile(filename, dest, s.bucket)
+func (s *ServiceModel3D) DownloadFile(filename string) ([]byte, error) {
+	// Crear un buffer internamente
+	var buf bytes.Buffer
+
+	// Descargar el archivo desde GridFS al buffer
+	_, err := s.bucket.DownloadToStreamByName(filename, &buf)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to download file: %w", err)
 	}
-	return dataFile, nil
+
+	// Retornar el contenido como un []byte
+	return buf.Bytes(), nil
 }
